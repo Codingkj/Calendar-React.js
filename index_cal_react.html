@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>KK Calendar</title>
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+
+  <script src="http://code.jquery.com/jquery-2.1.4.min.js"> </script>
+  <!--jQuery UI and style sheets next 4 lines.  -->
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <link rel="stylesheet" href="../../jquery-ui-1.11.4/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="../../jquery-ui-1.11.4/jquery-ui.js"></script>
+   
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZgE4487vDwz7ZksO5AAOMqFuuENHT_CY&signed_in=true"
+    //     async defer>
+</script> -->
+
+</head>
+<body>
+
+ <script src="http://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true">
+   </script>
+  <script>
+
+    var month= "November"; 
+    var dateselected="";    //could move this
+    var taskEntries={};
+    var year='2015';
+    var numCols = 7; 
+
+  function findInitialMonth(){
+
+  };  
+
+  function createInitialPageView(){
+    //put in here everything that creates the DOM.
+    $divtop= $('<div></div>');//.addClass("month-header");
+    $headx =$('<p></p>').addClass("calMonth").text("November 2015"); 
+    $mapviewbutton=$('<button id="mapviewbutton" type="button">View Tasks by Map</button>');
+    $divtop.append($mapviewbutton);
+    $divtop.append($headx);
+    $('body').append($divtop);
+
+
+ // var Model = function modelInit(){
+//put in here all the stuff that sets up the model, where model is the data store.
+// Model is data structure. test: if you don't impact on view/DOM its model.
+
+    for (var x=0;x<31;x++){
+      taskEntries[x]="";}
+
+    var locationsArray=new Array(30);  
+     for (var i = 0; i < 30; i++) {
+          locationsArray[i] = new Array(2);
+          locationsArray[i]=[];
+        }
+    var bounds = new google.maps.LatLngBounds();  //could move this
+};
+
+  function getDatesinMonth(month,year){
+    //replace for loop with real code
+    var datesInMonth=30;
+    var dateArray=[];
+    for (var counter;counter<30;counter++){
+        dateArray.push=(counter+1);
+    }
+    return dateArray;
+  };
+
+  function createGridOfDatesView(){
+
+    var daynames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]; 
+    var daysInMonth=30;
+
+    var table1=document.createElement('table');
+    table1.setAttribute("id","grid");  
+    document.body.appendChild(table1);
+    
+    function assignWeekdayLabelsToColumns(){
+            $.each(daynames, function(index) {
+            if(!(index%numCols)) tableRow = $('<tr>');
+
+            cell = $('<td>').html(daynames[index]);
+            cell.addClass('firstrow');
+            $('#grid').append(tableRow.append(cell)); 
+
+        });
+    };
+
+    function getStartingDateCell(){
+        var firstOfTheMonth = new Date('November 1, 2015 00:00:00');
+        var weekdayStart = firstOfTheMonth.getDay();
+        startCell = 7 - weekdayStart;
+        return startCell;
+    };
+
+    function assignDatesToCells(daysInMonth){
+        var daysToUse=[];
+        var cellsThatCanHaveDates=$('datecell');  
+        var offsetPosition = getStartingDateCell();
+        var dayInTheMonth=1;
+         
+
+        for (var x=0;x<startCell-1;x++){
+            cellsThatCanHaveDates[x]="";
+            daysToUse.push(cellsThatCanHaveDates[y]);
+        }
+      
+        for (var y=startCell-1; y<daysInMonth+startCell;y++){
+                cellsThatCanHaveDates[y]=dayInTheMonth;
+                dayInTheMonth=dayInTheMonth+1;
+                daysToUse.push(cellsThatCanHaveDates[y].toString());
+        }   
+
+        $.each(daysToUse, function(index) {
+            if(!(index%numCols)) tableRow = $('<tr>');
+
+            cell = $('<td>').html(daysToUse[index]);
+            cell.addClass('active');
+            $('#grid').append(tableRow.append(cell)); 
+        }); 
+    }
+
+    assignWeekdayLabelsToColumns();
+    getStartingDateCell();
+    assignDatesToCells(daysInMonth);
+
+  };
+
+  function createButton(buttonlabel){
+
+  };
+
+
+  function createTaskEntryForm(){
+    $formdiv=$('<div id="entire-div"></div>').addClass('hidden');  // 
+    $taskform = $('<form id="taskform"></form>'); 
+    $formheader=$('<p id="headtext"></p>').addClass('headingtext');  //
+    $taskform.append($formheader);
+    $textlabel=$('<p class="pcode2">Enter details of your task:</p>');
+    $taskform.append($textlabel);
+    $textfield=$('<textarea></textarea>');
+    $textfield.attr("id","taskWords").addClass("textbox").attr("name","textfieldname");
+    $taskform.append($textfield);
+    $mapdiv1=$('<div id="map"></div>').addClass("mapstyle");
+    $taskform.append($mapdiv1);
+ 
+    $findbutton=$('<button id="findbutton" type="button">FIND</button>');
+    $pcodelabel=$('<p class="pcode">Enter Postcode for task (if there is one):</p>');
+    $postcodebox=('<input type="text" id="postcode"></input>');
+    $taskform.append($pcodelabel).append($postcodebox).append($findbutton);
+    $submitfield=$('<button id="submitbutton">SAVE</button>'); 
+    $submitfield.attr("type","button");
+    $cancelfield=$('<button>CANCEL</button>'); 
+    $cancelfield.attr("type","button").attr("id","cancelbutton");
+    $taskform.append($submitfield).append($cancelfield);;
+    $formdiv.append($taskform);
+    $('body').append($formdiv);
+  };
+
+function createTaskEditForm(){
+    $secondformdiv=$('<div id="secondDiv"></div>').addClass("hidden");
+    $secondtaskform=$('<form id="secondformpage"></form>');
+    $secondformheader=$('<p id="headtext"></p>').addClass("headingtext");
+    $secondtextfield=$('<p id="oldtextId"></p>').addClass("oldtext");
+    $closefield=$('<button id="closebutton">CLOSE</button>');   
+    $editfield=$('<button>EDIT</button>').attr("ID","editbutton");      
+    $removefield=$('<button>REMOVE</button>').attr("id","removebutton");  
+    $linebr=$('<br></br>');  
+
+    $secondtaskform.append($secondformheader).append($linebr).append($linebr).append($secondtextfield).append($linebr).append($closefield).append($editfield).append($removefield);  
+    $secondformdiv.append($secondtaskform); 
+    $('body').append($secondformdiv); 
+
+};
+
+function createMapView(){  //I think this is a mixture of DOM and view stuff.
+   $formdiv2=$('<div id="formdiv2"></div>').addClass("hidden");  // 
+    $mapform2 = $('<form id="mapform2"></form>'); 
+    $formheader2=$('<p id="mapheader">November Tasks by Map</p>'); 
+
+    $gobackfield=$('<button id="gobackbutton">Go back to calendar view</button>'); 
+    $gobackfield.attr("type","button");
+    $formheader2.append($gobackfield);
+    $formdiv2.append($formheader2);
+
+    $sliderContainer=$('<div id="slider-range"></div>');
+    
+    $sliderText3=$('<p></p>');
+    $sliderSlideInput=$('<input id="slidevalue" type="text"></input>').addClass("sliderstyle");
+    $sliderSlideLabel=$('<label for="amount">Show tasks between:</label>');
+    $sliderSlideInput.readonly=true;
+    $sliderText3.append($sliderSlideLabel);
+    $sliderText3.append($sliderSlideInput);
+    
+    $sliderContainer.append($sliderText3);
+    $mapform2.append($linebr);
+    $mapform2.append($sliderContainer);
+
+    $textlabel=$('<p class="pcode2">The tasks in range are:</p>');
+    $mapdiv2=$('<div id="mapview-mapdiv"></div>').addClass("mapstyle2");
+    $mapform2.append($mapdiv2);
+
+    $taskdiv=$('<div id="taskdiv"></div>');
+    $mapform2.append($taskdiv);
+    $formdiv2.append($mapform2);
+    $('body').append($formdiv2);  
+};
+
+function findTodaysDate(){
+    var today = new Date().getDate();
+    var alldates = document.getElementsByClassName("active");
+    for (var i=0; i < alldates.length;i++){
+        if (alldates[i].innerHTML == today){
+          var selecteddate = alldates[i];
+          selecteddate.setAttribute("class","todaysdate");
+        }
+    }
+};
+
+function changeFormToVisible(formtochange){
+    var changeform = $('#'+ formtochange);
+    changeform.addClass('visible').removeClass('hidden');    
+} ;
+
+function changeFormToHidden(formtochange){
+    var changeform = $('#'+ formtochange);
+    changeform.addClass('hidden').removeClass('visible'); 
+};
+
+function changeFormHeader(dateselected, month, year){
+    $('p.headingtext').text([dateselected]+ ' '+month+' ' + year);
+};
+
+function chooseAFormToDisplay(dateselected){
+    if (taskEntries[dateselected] === ""){
+        return 'entire-div'
+        }
+    else {
+        return 'secondDiv';
+        }
+};  
+
+function highlightDate(date){
+    $('#'+ dateselected).addClass('shaded');
+};  
+
+function unHighlightDate(date){
+    $('#'+ dateselected).addClass('unshaded');
+};
+
+function displayExistingTask(dateselection){
+    $('#oldtextId').text(taskEntries[dateselection]); 
+};
+
+function checkForValidTaskEntry(text){
+    if (text===""){
+          return ('Hey, enter something before you save - or press Cancel');   
+        }
+};
+function storeTaskEntry(text,date){
+    taskEntries[date]=text;
+}
+function clearTaskText(){
+    $('#taskWords').val('');           //empty the textbox  
+    dateselected="";              // change the dateselected back to nothing
+}
+
+$(function(){      
+
+    createInitialPageView();
+    createGridOfDatesView();
+    findTodaysDate();
+
+    createTaskEntryForm();
+    createTaskEditForm();
+    createMapView();
+        
+  
+$( ".active" ).click(function(){
+    dateselected=event.target.textContent;
+    var formtochange = chooseAFormToDisplay(dateselected);
+    changeFormHeader(dateselected,month,year);
+    changeFormToVisible(formtochange);
+    displayExistingTask(dateselected);
+    highlightDate(dateselected);
+    });      
+
+  //****SAVE/SUBMIT BUTTON
+$('#submitbutton').click(function(){
+    event.preventDefault(); 
+    event.stopPropagation();
+    var textEntered=$('textarea').val(); 
+
+    checkForValidTaskEntry(textEntered);
+    storeTaskEntry(textEntered,dateselected);
+    highlightDate(dateselected);    
+    changeFormToHidden('entire-div');  
+    clearTaskText(); 
+    });  
+
+//***** CANCEL BUTTON
+$( "#cancelbutton" ).click(function(){
+    event.preventDefault(); 
+    event.stopPropagation();   
+                         
+    changeFormToHidden('entire-div');                      
+    unHighlightDate(dateselected);    //return the highlighting off 
+    clearTaskText();
+});    
+
+//** FORM2 BUTTON CLOSE
+$( "#closebutton" ).click(function(){
+    event.preventDefault(); 
+    event.stopPropagation();
+    //cancel form = delete text, turn to hidden, and empty textbox
+    taskEntries.dateselected="";  
+    changeFormToHidden('secondDiv');
+    highlightDate(dateselected);
+    dateselected="";
+});    
+
+//*****  FORM2 EDIT BUTTON
+$( "#editbutton" ).click(function(){
+        event.preventDefault();
+        event.stopPropagation();   
+        changeFormToVisible('secondDiv');     
+}); 
+
+//**** ReMOVE BUTTON
+$( "#removebutton" ).click(function(){
+        event.preventDefault(); 
+        event.stopPropagation();
+        console.log("Date selected is now:",dateselected);
+        unHighlightDate(dateselected);   //remove shading on main form  
+        taskEntries[dateselected]="";                     // change the current date entry to empty string
+        changeFormToHidden('secondDiv');  //change form 2 to be hidden.
+});       
+
+
+$("#mapviewbutton").click(function () {   // to display all tasks on 1 map
+        event.preventDefault(); 
+        event.stopPropagation();
+        console.log("got here too!!!!");
+        $('#formdiv2').addClass("mapsurround2").removeClass("hidden");
+      //  geoTest();  //go and get users current location as starting point for map.
+        var olat= -41.28;
+        var olng= 174.77;
+        var mapOptions={ 
+            center:new google.maps.LatLng(olat,olng),
+            zoom:12   };
+
+        var mylatlng = new google.maps.LatLng(olat, olng);
+        console.log("mylatlng", mylatlng);
+        var map= new google.maps.Map(document.getElementById("mapview-mapdiv"),mapOptions);
+        var marker = new google.maps.Marker({
+                    position:{lat: olat, lng: olng},
+                    map: map,
+                    title: 'Your task is here!',
+                   });  
+
+
+//slider functionality
+$(function() {
+        $("#slider-range").slider({
+          range: true,
+          min: 1,
+          max: 30,
+          values:[1,20],
+      
+        slide: function( event, ui ) {
+                  $( "#slidevalue" )
+                     .val(ui.values[ 0 ] + " - " + ui.values[ 1 ] + "  November");
+               },
+        start: function( event, ui ) {
+                  $( "#startvalue" )
+                     .val(ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+               },
+        stop: function( event, ui ) {
+                  $( "#stopvalue" )
+                    .val(ui.values[ 0 ] + " - " + ui.values[ 1 ] ); 
+                    var counter=ui.values[0];
+                    var map = new google.maps.Map(document.getElementById('mapview-mapdiv'), {
+                              zoom: 10,
+                              center: new google.maps.LatLng(klat,klng),
+                              mapTypeId: google.maps.MapTypeId.ROADMAP
+                            });
+
+                    var marker, i, tkcount;
+                    var tkcount=0;
+                    var infowindow = new google.maps.InfoWindow();
+                    for (i=ui.values[0];i<ui.values[1]; i++){
+                        if (taskEntries[i]!==""){
+                            tkcount=tkcount+1;
+                        }
+                    }
+                    $taskcount=$('<p>There are,{tkcount},tasks in this range:</p>');
+                    $taskdiv.append($taskcount);
+
+                    for (i=counter;i<ui.values[1]; i++){
+                        marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(locationsArray[i][0], locationsArray[i][1]),
+                            map: map,
+                            
+                            });
+
+                        if (taskEntries[i]!==""){
+                            var numtasks=numtasks+1;
+                            $textbox4=$('<div id="textbox4"></div>');
+                            $ptext4=$('<p></p>');
+                            $ptext4.val=taskEntries[i];
+                            console.log("what text you got?",$ptext4.val);
+                           // if (ptext4.val!==""{
+                            $linebr=$('<br></br>'); 
+                            $textbox4.append(i," Nov: ",$ptext4.val).append($linebr);
+                            $taskdiv.append($textbox4);  
+                            $taskdiv.append($linebr);
+                            $taskdiv.append($linebr);
+                            }
+
+                        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                            return function() {
+                                  infowindow.setContent(taskEntries[i]);
+                                  infowindow.open(map, marker);
+                                }
+                              })(marker, i));
+                        }   //end of for loop
+                          
+            },  //end of slider stop function
+         });  //end of .slider function
+      });  //end of  slider functionality function call
+    });  //end of mapview
+
+$( "#gobackbutton" ).click(function(){
+        event.preventDefault(); 
+        event.stopPropagation();   
+                                
+        $('#formdiv2').addClass("hidden").removeClass("mapsurround2");                          
+        $('#textbox4')=$('<div id="textbox4"></div>');
+    });    
+
+
+$( "#findbutton" ).click(function(){
+        event.preventDefault(); 
+        event.stopPropagation();     
+        var search=$('#postcode').val();
+        // var characterReg = /([a-zA-Z0-9])/; 
+        // if(!characterReg.test(search)) {
+        //     $(this).after('<span class="error-text">Between 4 - 6 characters please.</span>');
+        // }
+        var url=('http://api.postcodes.io/postcodes/'+ search);
+        console.log("url is...",url);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', encodeURI(url));
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                console.log('Not OK: ' + xhr.status);
+                 return;
+            }
+            var data = JSON.parse(xhr.responseText);
+      
+            klat= data.result.latitude;
+            klng= data.result.longitude;
+            var mapOptions={ 
+            center:new google.maps.LatLng(klat,klng),
+            zoom:12   };
+
+            var mylatlng = new google.maps.LatLng(klat, klng);
+            console.log("mylatlng", mylatlng);
+            var map= new google.maps.Map(document.getElementById("map"),mapOptions);
+            var marker = new google.maps.Marker({
+                        position:{lat: klat, lng: klng},
+                        map: map,
+                        title: 'Your task is here!',
+                      });    
+        
+            locationsArray[dateselected]=[klat,klng];
+            console.log("Storage entry is: ",locationsArray[dateselected]);
+        };
+        xhr.send();
+        
+      });
+
+});
+
+</script>
+</body>
+</html>
